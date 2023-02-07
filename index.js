@@ -21,6 +21,7 @@ alert ("Por ultimo quisieramos saber tu edad.");
     alert("Ingresaste: " + edad + " años. Antes de avanzar consultalo con un adulto")
 }; 
 
+alert ("Vamos a hacer un calculo simple de una inversion.")
 let importe;
 do {
     importe = parseInt(prompt("Ingrese el importe que quiere invertir:"));
