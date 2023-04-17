@@ -148,7 +148,7 @@ if(shoppingCart.length == 0){
         </tr>`
     tbody.innerHTML += cart
     }
-    
+
     const btnAgregarUno = document.getElementById("botonAgregarUno");
         btnAgregarUno.addEventListener('click', () => {
         const carrito = JSON.parse(localStorage.getItem('shoppingCart'));
