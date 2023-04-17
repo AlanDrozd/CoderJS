@@ -16,6 +16,12 @@ header{
     color: white;
     text-align: left;
 }
+
+header p {
+    text-align: right;
+    padding-right: 50px;
+    font-size: 10px;
+}
 nav{
     background-color: black;
 }
@@ -116,7 +122,9 @@ table tr th{
     padding-left: 10px;
 }
 .imgProdCart{
+    object-fit: cover;
     width: 70px;
+    height: 70px;
 }
 /* .nameProd{
     align-items: center;

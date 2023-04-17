@@ -21,12 +21,16 @@ articles.push(new Product("08", "Corrector Liquido", 1290, "MakeUp", "./assets/i
 
 let shoppingCart=[];
 
-if (JSON.parse(localStorage.getItem("shoppingCart"))){
-    shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"))
-} else {
-    localStorage.setItem("shoppingCart", JSON.stringify([]))
-    shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"))
-}
+function loadShoppingCart() {
+    if (JSON.parse(localStorage.getItem("shoppingCart"))) {
+      shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"));
+    } else {
+      localStorage.setItem("shoppingCart", JSON.stringify([]));
+      shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"));
+    }
+  }
+  
+loadShoppingCart();
 
 function desplegarProducts() {
     for (let i = 0; i < articles.length; i++) {
@@ -53,12 +57,11 @@ function desplegarProducts() {
 
 desplegarProducts()
 
-const btnAgregar = document.getElementsByClassName('btnAgregar')
+const btnAgregar = document.getElementsByClassName('btnAgregar');
+    Array.from(btnAgregar).forEach((btn) => {
+    btn.addEventListener('click', agregarAlCarrito);
+});
 
-for (let i = 0; i < btnAgregar.length; i++) {
-    const element = btnAgregar[i];
-    element.addEventListener('click', agregarAlCarrito)       
-}
 
 function agregarAlCarrito (e) {
     const btn = e.target;
@@ -69,13 +72,13 @@ function agregarAlCarrito (e) {
         shoppingCart.push({...prodEncontrado, cantidad: 1})
     } else {
         let carritoFiltrado = shoppingCart.filter(art => art.id != enCarrito.id)
-        shoppingCart = [...carritoFiltrado, {...enCarrito, cantidad: enCarrito.cantidad +1}]
+        shoppingCart = [...carritoFiltrado, {...enCarrito, cantidad: enCarrito.cantidad += 1}]
     }
     localStorage.setItem('shoppingCart', JSON.stringify(shoppingCart))
+    location.reload();
 }
-const totalCarrito = () => {
-    return shoppingCart.reduce((acc, art) => acc + art.price * art.cantidad, 0)
-}
+
+const totalCarrito = () => shoppingCart.reduce((acc, art) => acc + art.price * art.cantidad, 0);
 
 if (JSON.parse(localStorage.getItem("shoppingCart"))){
     shoppingCart = JSON.parse(localStorage.getItem("shoppingCart"))
@@ -90,7 +93,7 @@ if(shoppingCart.length == 0){
     <div class="cartContainer">
         <h3 class='txtCarrito'>El carrito esta vacio</h1>
         <a href='index.html'>
-            <button class='btnCart'>VOLVER</button>
+            <button class='btnCart'>Actualizar</button>
         </a>
     </div>`;
     body.innerHTML += texto;
@@ -105,14 +108,19 @@ if(shoppingCart.length == 0){
         <table>
             <thead>
                 <tr>
+                    <th>Cod. Interno</th>
                     <th>Productos</th>
                     <th>Cantidad</th>
+                    <th>Agregar uno</th>
+                    <th>Quitar uno</th>
                     <th>Precio</th>
                 </tr>
             </thead>
             <tbody id='tbody'></tbody>
             <tfoot>
                 <tr>
+                    <th></th>
+                    <th></th>
                     <th></th>
                     <th>Total:</th>
                     <th id='total'>$${totalCarrito().toLocaleString()}</th>
@@ -131,35 +139,78 @@ if(shoppingCart.length == 0){
         const { id, name, img, price, cantidad} = element;
         const cart = `
         <tr id=${id}>
-            <th class='detallesTabla'><img class= 'imgProdCart' src=${img} alt=''><span class='nameProd'>${name}</span></th>
+            <th>${id}</th>
+            <th class='detallesTabla'><img class= 'imgProdCart' src=${img} alt=''><span class='nameProd'>- ${name}</span></th>
             <th>${cantidad}</th>
+            <th><button id="botonAgregarUno"><img class='imgBtnCart' src='assets/images/add.png' alt='addOne'></button></th>
+            <th><button id="botonQuitarUno"><img class='imgBtnCart' src='assets/images/trash.png' alt='trash'></button></th>
             <th>$${(cantidad * price).toLocaleString()}</th>
         </tr>`
     tbody.innerHTML += cart
     }
+    
+    const btnAgregarUno = document.getElementById("botonAgregarUno");
+        btnAgregarUno.addEventListener('click', () => {
+        const carrito = JSON.parse(localStorage.getItem('shoppingCart'));
+        const producto = carrito.find((prod) => prod.id === id);
+        if (producto) {
+          producto.cantidad += 1;
+        } else {
+            const nuevoProducto = {
+            id: prodEncontrado.id,
+            name: prodEncontrado.name,
+            price: prodEncontrado.price,
+            category: prodEncontrado.category,
+            img: prodEncontrado.img,
+            cantidad: 1,
+          };
+          carrito.push(nuevoProducto);
+        }
+        localStorage.setItem('shoppingCart', JSON.stringify(carrito));
+        location.reload();
+      });
 
+    const btnQuitarUno = document.getElementById("botonQuitarUno");
+        btnQuitarUno.addEventListener('click', () => {
+        const carrito = JSON.parse(localStorage.getItem('shoppingCart'));
+        const producto = carrito.find((prod) => prod.id === id);
+    if (producto.cantidad > 1) {
+        producto.cantidad -= 1;
+    } else {
+        const indice = carrito.indexOf(producto);
+        carrito.splice(indice, 1);
+    }
+        localStorage.setItem('shoppingCart', JSON.stringify(carrito));
+        location.reload();
+    });
 
-    // <th><button><img class='imgBtnCart btnTrash' src='assets/images/trash.png' alt='trash'></button></th>
-    // <th><button><img class='imgBtnCart btnRemove' src='assets/images/remove.png' alt='removeOne'></but11ton></th>
-    // <th><button><img class='imgBtnCart btnAdd' src='assets/images/add.png' alt='addOne'></button></th>
-    // function removeOne (e) {
-    //     const btn = e.target;
-    //     const id = btn.getAttribute('id') 
-    //     const prodEncontrado = shoppingCart.find(art => art.id != id)
-    //     const enCarrito = shoppingCart.filter(art => art.id == prodEncontrado.id) 
-    //     // if (!enCarrito){
-    //     //     shoppingCart.splice({...prodEncontrado, cantidad: 1})
-    //     // } else {
-    //     //     let carritoFiltrado = shoppingCart.find(art => art.id == enCarrito.id)
-    //     //     shoppingCart = [...carritoFiltrado, {...enCarrito, cantidad: enCarrito.cantidad -1}]
-    //     // }
-    //     localStorage.setItem('shoppingCart', JSON.stringify(shoppingCart))
-    // }
-    // console.log(shoppingCart)
 
     let deleteCart = document.getElementById("vaciar");
         deleteCart.onclick = () => {
         shoppingCart = []
         localStorage.setItem('shoppingCart', JSON.stringify(shoppingCart))
+        location.reload();
     }
+
+    let terminarOperacion = document.getElementById("terminar");
+        terminarOperacion.onclick = () => {
+            Swal.fire(
+                'Gracias por elegirnos',
+                'Seras redirigido a... algun lugar... porque aun estamos desarrollando...',
+                'info'
+              )
+        }
 }
+
+const criptoYa = "https://criptoya.com/api/dolar"
+const divMonedas = document.getElementById("divMonedas");
+setInterval( () => {
+    fetch(criptoYa)
+        .then(response => response.json())
+        .then(({blue, ccl, oficial, solidario}) => {
+            divMonedas.innerHTML = `
+                <p>Tipos de cambio de Dolar: Oficial $${oficial} - Solidario $${solidario} - Blue $${blue} </p>    
+            `
+        }) 
+        .catch(error => console.log(error))
+}, 2000)
